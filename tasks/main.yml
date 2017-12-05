@@ -13,7 +13,7 @@
 
 - name: empty password login disabled
   lineinfile: 
-    path: {{ sshd_config }} 
+    path: "{{ sshd_config }}" 
     regexp: "^PermitEmptyPasswords" 
     line: "PermitEmptyPasswords no"
   notify: sshd_changed

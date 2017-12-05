@@ -1,7 +1,7 @@
 ---
 dependencies:
- - { role: goozbach.EPEL }
-   when: ansible_distribution == "CentOS" 
+ - role: goozbach.EPEL
+   when: ansble_os_family == "RedHat" 
 
 galaxy_info:
   author: gabethecabbage
