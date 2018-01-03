@@ -11,7 +11,7 @@ None
 
 ## Role Variables
 
-'''sshd_config''' provides the path to the ssh server config files and defaults to '''/etc/ssh/sshd_config'''
+```sshd_config``` provides the path to the ssh server config files and defaults to ```/etc/ssh/sshd_config```
 
 ## Dependencies
 
@@ -19,8 +19,8 @@ None
 (provides the fail2ban package on RHEL family OS's
 
 ## Example Playbook
-'''
+```
     - hosts: servers
       roles:
         - role: gabethecabbage.secure-ssh
-'''
+```
