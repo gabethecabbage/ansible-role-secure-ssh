@@ -1,3 +1,10 @@
 ---
-- name: sshd_changed
-  service: name=sshd state=restarted
+- name: fail2ban changed
+  service:
+    name: fail2ban
+    state: restarted
+
+- name: sshd changed
+  service:
+    name: sshd
+    state: restarted

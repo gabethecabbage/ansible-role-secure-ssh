@@ -1,27 +1,7 @@
 ---
-- name: fail2ban installed and latest version
-  package:
-    name: fail2ban 
-    state: present
+- name: Configure sshd
+  include_tasks: sshd.yml
 
-- name: fail2ban started and enabled
-  service: 
-    name: fail2ban 
-    state: started 
-    enabled: yes
+- name: Configure fail2ban
+  include_tasks: fail2ban.yml
 
-
-- name: empty password login disabled
-  lineinfile: 
-    path: "{{ sshd_config }}" 
-    regexp: "^PermitEmptyPasswords" 
-    line: "PermitEmptyPasswords no"
-  notify: sshd_changed
-
-- name: root SSH access disallowed without a keypair
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^PermitRootLogin"
-    line: "PermitRootLogin without-password"
-    state: present
-  notify: sshd_changed

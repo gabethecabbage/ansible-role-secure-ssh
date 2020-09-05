@@ -1,6 +1,7 @@
 ---
 dependencies:
-  - { role: goozbach.EPEL, when: ansible_os_family == "RedHat" }
+  - role: goozbach.EPEL
+    when: ansible_os_family == "RedHat"
 
 galaxy_info:
   author: gabethecabbage
@@ -14,6 +15,7 @@ galaxy_info:
         - yakkety
         - zesty
         - artful
+        - bionic
     - name: EL
       versions:
         - 6

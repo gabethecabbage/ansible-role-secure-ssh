@@ -1,3 +1,19 @@
 ---
+# ssh daemon config path
 sshd_config: /etc/ssh/sshd_config
-...
+
+# ssh daemon secure configuration options
+sshd_allow_pass_auth: True
+sshd_empty_pass_auth: False
+sshd_root_login: True
+sshd_root_pass_auth: False
+sshd_idle_timeout: -1
+sshd_allowed_users: []
+sshd_enforce_protocol_2: True
+sshd_port: 22 
+
+# fail2ban configuration options
+fail2ban_present: True
+fail2ban_bantime: 600
+fail2ban_findtime: 600
+fail2ban_maxretry: 3

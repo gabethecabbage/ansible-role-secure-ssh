@@ -1,0 +1,17 @@
+---
+- name: "{{ task_action }} fail2ban"
+  package:
+    name: fail2ban
+    state: "{{ task_config }}"
+  vars:
+    task_action: "{{ fail2ban_present | ternary('Install', 'Uninstall') }}"
+    task_config: "{{ fail2ban_present | ternary('present', 'absent') }}"
+  register: fail2ban_package_state
+
+- name: "{{ task_action }} fail2ban"
+  service:
+    name: fail2ban
+    enabled: "{{ fail2ban_present }}" 
+  vars:
+    task_action: "{{ fail2ban_present | ternary('Enable', 'Disable') }}"
+  when: fail2ban_present or (fail2ban_package_state.changed and not fail2ban_present)

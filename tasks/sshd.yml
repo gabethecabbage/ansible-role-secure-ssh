@@ -1,0 +1,91 @@
+---
+- name: "{{ task_action }} password based SSH access"
+  lineinfile:
+    path: "{{ sshd_config }}"
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication {{ task_config }}"
+  vars:
+    task_action: "{{ sshd_allow_pass_auth | ternary('Allow', 'Prevent') }}"
+    task_config: "{{ sshd_allow_pass_auth | ternary('yes', 'no') }}"
+  notify: sshd changed
+
+- name: "{{ task_action }} empty password SSH access"
+  lineinfile:
+    path: "{{ sshd_config }}"
+    regexp: "^#?PermitEmptyPasswords"
+    line: "PermitEmptyPasswords {{ task_config }}"
+  vars:
+    task_action: "{{ sshd_empty_pass_auth | ternary('Allow', 'Prevent') }}"
+    task_config: "{{ sshd_empty_pass_auth | ternary('yes', 'no') }}"
+  notify: sshd changed
+
+- name: "{{ task_action }} password based root SSH access"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin {{ task_config }}"
+    state: present
+  vars:
+    task_action: "{{ sshd_root_login | ternary('Allow', 'Prevent') }}"
+    task_config: "{{ sshd_root_login | ternary('yes', 'no') }}"
+  when: sshd_root_pass_auth
+  notify: sshd changed
+
+- name: "{{ task_action }} key-pair based root SSH access"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin {{ task_config }}"
+    state: present
+  vars:
+    task_action: "{{ sshd_root_login | ternary('Allow', 'Prevent') }}"
+    task_config: "{{ sshd_root_login | ternary('without-password', 'no') }}"
+  when: not sshd_root_pass_auth
+  notify: sshd changed
+
+- block:
+    - name: "Set SSH session idle timeout"
+      lineinfile:
+        path: "{{ sshd_config }}"
+        regexp: "^#?ClientAliveInterval"
+        line: "ClientAliveInterval {{ sshd_idle_timeout | string }}"
+      notify: sshd changed
+    - lineinfile:
+        path: "{{ sshd_config }}"
+        regexp: "^#?ClientAliveCountMax"
+        line: "ClientAliveCountMax 0"
+      notify: sshd changed
+  when: sshd_idle_timeout != -1
+
+- name: "Add root to allowed users"
+  set_fact:
+    sshd_allowed_users: "{{ sshd_allowed_users.append('root') }}"
+  when:
+    - sshd_root_login
+    - sshd_allowed_users | length > 0
+
+- name: "Set list to limit allowed ssh users"
+  lineinfile:
+    path: "{{ sshd_config }}"
+    regexp: "^#?AllowUsers"
+    line: "AllowUsers {{ sshd_allowed_users | join(' ') }}"
+  when: sshd_allowed_users | length > 0
+  notify: sshd changed
+
+- name: "{{ task_action }} ssh protocol 2"
+  lineinfile:
+    path: "{{ sshd_config }}"
+    regexp: "^#?Protocol 2"
+    line: "Protocol {{ task_config }}"
+  vars:
+    task_action: "{{ sshd_enforce_protocol_2 | ternary('Enforce', 'Dont enforce') }}"
+    task_config: "{{ sshd_enforce_protocol_2 | ternary('2', '2,1') }}"
+  when: sshd_enforce_protocol_2
+  notify: sshd changed
+
+- name: set ssh port
+  lineinfile:
+    path: "{{ sshd_config }}"
+    regexp: "^#?Port"
+    line: "Port {{ sshd_port }}"
+  notify: sshd changed
